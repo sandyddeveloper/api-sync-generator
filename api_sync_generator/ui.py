@@ -1,5 +1,6 @@
 import os
 import sys
+import socket
 from pywebio import start_server
 from pywebio.input import *
 from pywebio.output import *
@@ -70,9 +71,20 @@ def run_ui():
             put_error(f"Failed to generate: {str(e)}")
             put_text("Make sure your backend server is running if fetching from URL, or your dependencies are installed if extracting locally.")
 
+def get_free_port(start_port=8080):
+    for port in range(start_port, start_port + 50):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            try:
+                s.bind(('127.0.0.1', port))
+                return port
+            except OSError:
+                continue
+    return start_port
+
 def start_ui():
-    print("Starting Web Dashboard on http://localhost:8080")
-    start_server(run_ui, port=8080, debug=True)
+    port = get_free_port(8080)
+    print(f"Starting Web Dashboard on http://localhost:{port}")
+    start_server(run_ui, port=port, debug=True)
 
 if __name__ == '__main__':
     start_ui()
