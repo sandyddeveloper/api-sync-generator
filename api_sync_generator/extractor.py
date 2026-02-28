@@ -12,8 +12,14 @@ class SchemaExtractor:
 
     def extract(self) -> Dict[str, Any]:
         """
-        Extract the OpenAPI schema based on the configured framework or URL.
+        Extract the OpenAPI schema based on the configured framework or URL or cURL string.
         """
+        if self.config.curl_command:
+            try:
+                return self._extract_from_curl(self.config.curl_command)
+            except Exception as e:
+                print(f"Failed to fetch schema from cURL: {e}")
+                print("Falling back to URL/framework hook...")
         if self.config.openapi_url and self.config.openapi_url.startswith("http"):
             urls_to_try = [self.config.openapi_url]
             
@@ -43,6 +49,51 @@ class SchemaExtractor:
             return self._extract_django()
         else:
             raise ValueError(f"Unsupported framework: {self.config.framework}")
+            
+    def _extract_from_curl(self, curl_str: str) -> Dict[str, Any]:
+        """
+        Parse a raw full cURL command string into a python requests call.
+        """
+        import shlex
+        
+        args = shlex.split(curl_str)
+        if args[0] != "curl":
+            raise ValueError("String must start with 'curl'")
+            
+        url = None
+        headers = {}
+        method = "GET"
+        data = None
+        
+        i = 1
+        while i < len(args):
+            arg = args[i]
+            if arg in ("-H", "--header"):
+                i += 1
+                header = args[i]
+                if ":" in header:
+                    key, val = header.split(":", 1)
+                    headers[key.strip()] = val.strip()
+            elif arg in ("-X", "--request"):
+                i += 1
+                method = args[i].upper()
+            elif arg in ("-d", "--data", "--data-raw"):
+                i += 1
+                data = args[i]
+                if method == "GET":
+                    method = "POST"
+            elif not arg.startswith("-"):
+                # Usually the URL is the only non-flag argument
+                url = arg
+            i += 1
+            
+        if not url:
+            raise ValueError("Could not extract URL from cURL string")
+            
+        print(f"Executing extracted cURL request against {url}...")
+        response = requests.request(method, url, headers=headers, data=data, timeout=10)
+        response.raise_for_status()
+        return response.json()
 
     def _extract_fastapi(self) -> Dict[str, Any]:
         """

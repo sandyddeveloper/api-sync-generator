@@ -10,6 +10,7 @@ class GeneratorConfig(BaseModel):
     app_module: Optional[str] = "main:app" # Example: myapp.main:app
     django_settings: Optional[str] = None # Example: myproject.settings
     openapi_url: Optional[str] = None
+    curl_command: Optional[str] = None
     hooks_mode: str = "react_query" # "react", "react_query", "nextjs_actions", "none"
     exclude_tags: List[str] = ["@internal", "@admin_only"]
 

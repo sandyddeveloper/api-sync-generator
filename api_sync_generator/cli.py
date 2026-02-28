@@ -65,6 +65,7 @@ def main():
     
     # Dynamic Overrides
     parser.add_argument("--url", type=str, help="Dynamic fallback: Fetch OpenAPI schema directly from a URL (e.g., http://localhost:8000/openapi.json)")
+    parser.add_argument("--curl", type=str, help="Advanced fallback: Paste a raw cURL command to fetch the schema (handles Auth headers automatically)")
     parser.add_argument("--framework", type=str, choices=["fastapi", "django"], help="Override backend framework.")
     parser.add_argument("--out", type=str, help="Override frontend output directory.")
     parser.add_argument("--hooks", type=str, choices=["react", "react_query", "nextjs_actions", "none"], help="Override hook generation mode.")
@@ -83,6 +84,8 @@ def main():
     # Apply Dynamic Overrides
     if args.url:
         config.openapi_url = args.url
+    if args.curl:
+        config.curl_command = args.curl
     if args.framework:
         config.framework = args.framework
     if args.out:

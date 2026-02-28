@@ -88,6 +88,12 @@ Want to grab a schema from a remote server without setting up a `pyproject.toml`
 api-sync --url https://api.mycompany.com/openapi.json --framework fastapi --hooks react_query --out ./src/api
 ```
 
+### 🔒 Schemas Behind Authentication (The cURL Hack)
+If your OpenAPI schema is hidden behind an API Key or Bearer Token limit, you can simply paste the raw `curl` command directly into the CLI. The tool will parse the headers out and extract the schema perfectly:
+```bash
+api-sync --curl "curl -X GET 'https://api.mycompany.com/openapi.json' -H 'Authorization: Bearer my-secret-token'"
+```
+
 ### The `pyproject.toml` Configuration File
 If you bypass the `api-sync init` wizard, you can manually configure the tool in the root of your Python backend via `pyproject.toml`:
 
