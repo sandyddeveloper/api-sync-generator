@@ -1,0 +1,71 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  release:
+    types: [published]
+
+jobs:
+  build_and_test:
+    name: Build & Test (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache: 'pip'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install build wheel
+        pip install -e .
+        
+    - name: Verify CLI Installation
+      run: |
+        api-sync --help
+        
+    - name: Build Source & Wheel distributions
+      run: python -m build
+      
+    - name: Upload Build Artifacts
+      uses: actions/upload-artifact@v4
+      if: matrix.python-version == '3.11' # Only upload artifacts once
+      with:
+        name: python-package-distributions
+        path: dist/
+
+  pypi_publish:
+    name: Upload Release to PyPI
+    needs: build_and_test
+    # Only run this job if a new GitHub Release was published
+    if: github.event_name == 'release' && github.event.action == 'published'
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/api-sync-generator
+    
+    # Required for PyPI Trusted Publishing (OIDC)
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+    - name: Download Build Artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: python-package-distributions
+        path: dist/
+        
+    - name: Publish package to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
