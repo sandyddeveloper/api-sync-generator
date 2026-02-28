@@ -4,25 +4,10 @@ import socket
 from pywebio import start_server
 from pywebio.input import *
 from pywebio.output import *
-from .config import GeneratorConfig, load_config
+from .config import GeneratorConfig, load_config, auto_discover_config
 from .generator import generate_code
 from .extractor import extract_schema
 from .parser import parse_schema
-
-def find_framework():
-    if os.path.exists("main.py"):
-        return "fastapi"
-    elif os.path.exists("manage.py"):
-        return "django"
-    return "fastapi"
-
-def find_frontend():
-    for root, dirs, files in os.walk("."):
-        if "package.json" in files:
-            if "src" in dirs:
-                return os.path.join(root, "src", "api")
-            return os.path.join(root, "api")
-    return "./frontend/src/api"
 
 def run_ui():
     put_markdown("# ⚡ api-sync-generator")
@@ -30,13 +15,12 @@ def run_ui():
     
     put_html("<hr>")
     
-    auto_framework = find_framework()
-    auto_frontend = find_frontend()
+    auto_config = auto_discover_config()
 
     config_data = input_group("Integration Settings", [
-        select("Backend Framework", options=["fastapi", "django"], value=auto_framework, name="framework"),
-        input("OpenAPI URL (Optional if using FastAPI/Django directly)", value="http://localhost:8000/openapi.json", name="url"),
-        input("Frontend Output Directory", value=auto_frontend, name="out"),
+        select("Backend Framework", options=["fastapi", "django"], value=auto_config.framework, name="framework"),
+        input("OpenAPI URL (Optional if using FastAPI/Django directly)", value=auto_config.openapi_url or "http://localhost:8000/openapi.json", name="url"),
+        input("Frontend Output Directory", value=auto_config.frontend_dir, name="out"),
         select("React Hooks Mode", options=["react_query", "react", "nextjs_actions", "none"], value="react_query", name="hooks")
     ])
 

@@ -15,14 +15,27 @@ class SchemaExtractor:
         Extract the OpenAPI schema based on the configured framework or URL.
         """
         if self.config.openapi_url and self.config.openapi_url.startswith("http"):
-            try:
-                print(f"Fetching schema from {self.config.openapi_url}...")
-                response = requests.get(self.config.openapi_url)
-                response.raise_for_status()
-                return response.json()
-            except requests.exceptions.RequestException as e:
-                print(f"Failed to fetch schema from URL: {e}")
-                print("Falling back to framework hook...")
+            urls_to_try = [self.config.openapi_url]
+            
+            # Smart URL fallbacks
+            if not self.config.openapi_url.endswith(".json"):
+                base = self.config.openapi_url.rstrip("/")
+                urls_to_try.extend([f"{base}/openapi.json", f"{base}/api/schema/"])
+                
+            for url in urls_to_try:
+                try:
+                    print(f"Fetching schema from {url}...")
+                    response = requests.get(url, timeout=5)
+                    response.raise_for_status()
+                    
+                    # Ensure it's actually JSON and looks like openapi
+                    data = response.json()
+                    if "openapi" in data or "swagger" in data:
+                        return data
+                except (requests.exceptions.RequestException, ValueError) as e:
+                    print(f" -> Failed parsing {url}")
+            
+            print("Falling back to framework hook extraction...")
 
         if self.config.framework == "fastapi":
             return self._extract_fastapi()
