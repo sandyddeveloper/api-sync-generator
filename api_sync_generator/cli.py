@@ -7,6 +7,7 @@ from .extractor import extract_schema
 from .parser import parse_schema
 from .generator import generate_code
 from .watcher import start_watcher
+from .ui import start_ui
 
 def run_init_wizard():
     print("Welcome to the api-sync-generator setup wizard! 🚀")
@@ -56,7 +57,7 @@ def main():
     )
     
     # Init Wizard Command
-    parser.add_argument("command", nargs="?", help="Command to run (e.g. 'init')")
+    parser.add_argument("command", nargs="?", help="Command to run (e.g. 'init', 'ui')")
     
     # Core execution flags
     parser.add_argument("--watch", action="store_true", help="Run in continuous watch mode.")
@@ -72,6 +73,9 @@ def main():
     
     if args.command == "init":
         run_init_wizard()
+    elif args.command == "ui":
+        start_ui()
+        sys.exit(0)
     
     print("Loading config...")
     config = load_config(args.config)

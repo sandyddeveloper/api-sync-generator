@@ -31,9 +31,9 @@
 ## 🚀 Quickstart (The 2-Minute Integration)
 
 ### 1. Install the Generator
-Install the package globally or in your backend environment:
+Install the package straight from GitHub into your backend or global environment:
 ```bash
-pip install api-sync-generator
+pip install git+https://github.com/sandyddeveloper/api-sync-generator.git
 ```
 
 ### 2. Initialize your Project
@@ -49,6 +49,12 @@ api-sync
 ```
 
 *(Want real-time sync while you code? Just run `api-sync --watch`!)*
+
+### Or just use the Web UI!
+If you don't like configuring via terminal or typing out URL flags, you can spin up the built-in localhost dashboard. It automatically scans your folders, pre-fills your frameworks, and generates your types through a beautiful web form:
+```bash
+api-sync ui
+```
 
 ---
 
