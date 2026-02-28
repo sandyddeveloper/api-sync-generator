@@ -1,0 +1,36 @@
+# ⚡ 2-Minute Quickstart
+
+If you want to integrate the backend APIs immediately, follow these simple steps. This has been generated dynamically based on the available API schemas.
+
+### 1. Locate the Generated Code
+Your API client, React Hooks, and TypeScript Types have been generated in this directory (`./api`).
+
+### 2. Configure the API URL
+Ensure your frontend project (`.env.local`) has the environment variable pointing to the backend, e.g.:
+```bash
+NEXT_PUBLIC_API_URL=http://localhost:8000
+# or VITE_API_URL if using Vite
+```
+
+### 3. Immediately Use a Hook
+You don't need to write manual fetchers or `useState` hooks. Simply pick any generated hook.
+
+**Example Integration:**
+{% set first_endpoint = endpoints[0] if endpoints else none %}
+{% if first_endpoint %}
+{% set hook_name = 'use' ~ first_endpoint.operation_id[0]|upper ~ first_endpoint.operation_id[1:] %}
+```tsx
+import { {{ hook_name }} } from '@/api/hooks';
+
+export function QuickIntegration() {
+  const { execute, data, error, isLoading } = {{ hook_name }}();
+
+  // Call `execute({...})` on click or in a useEffect!
+}
+```
+{% else %}
+*No endpoints found to generate an example.*
+{% endif %}
+
+### 4. Need more details?
+Check out the `API_INTEGRATION.md` file located next to this file. It contains the exact "What, Why, and How" code blocks for **every single** endpoint!

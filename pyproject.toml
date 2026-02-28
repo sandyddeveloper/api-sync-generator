@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "api-sync-generator"
+version = "0.1.0"
+description = "Automates the generation of TypeScript interfaces, API clients, and React Hooks directly from a Django or FastAPI OpenAPI schema."
+readme = "README.md"
+authors = [
+    { name = "Developer" }
+]
+requires-python = ">=3.9"
+dependencies = [
+    "jinja2>=3.0.0",
+    "watchdog>=3.0.0",
+    "requests",
+    "pydantic"
+]
+
+[project.scripts]
+api-sync = "api_sync_generator.cli:main"
