@@ -30,13 +30,20 @@
 
 ## 🚀 Quickstart (The 2-Minute Integration)
 
-### 1. Install the Generator
-Install the package straight from GitHub into your backend or global environment:
+### 🥇 The "Zero-Install" Magic Command (Fastest)
+If you don't even want to install the package or manage virtual environments, you can run it perfectly using `uvx` or `pipx` (just like `npx` in JavaScript!). This downloads the tool into a temporary environment, runs the Web UI, and cleans up when you close it:
+
+```bash
+pipx run --spec git+https://github.com/sandyddeveloper/api-sync-generator.git api-sync ui
+```
+
+### 🥈 Traditional Installation
+If you prefer to install the package straight from GitHub into your backend or global environment:
 ```bash
 pip install git+https://github.com/sandyddeveloper/api-sync-generator.git
 ```
 
-### 2. Initialize your Project
+**1. Initialize your Project**
 Drop into your project and run the interactive setup wizard. It will ask you 3 simple questions (framework type, frontend output path, and hooks preference) and configure your setup automatically!
 ```bash
 api-sync init
